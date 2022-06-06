@@ -28,8 +28,12 @@ import loadShaders from './loadShaders';
 const DEFAULT_SHADERS = Object.freeze([
   '**/*.glsl', '**/*.wgsl',
   '**/*.vert', '**/*.frag',
-  '**/*.vs', '**/*.fs'
+  '**/*.vs', '**/*.fs', '**/*.shader.js'
 ]);
+
+const MERGED_SHADER = Object.freeze([
+  '**/*.shader.js'
+])
 
 /**
  * @function
@@ -54,6 +58,7 @@ export default function (
   let config: ResolvedConfig;
 
   const filter = createFilter(include, exclude);
+  const mergedShader = createFilter(MERGED_SHADER, exclude);
   const production = process.env.NODE_ENV === 'production';
 
   return {
@@ -70,7 +75,7 @@ export default function (
           loadShaders(source, shader, defaultExtension), shader, {
             sourcemap: config.build.sourcemap && 'external',
             minifyWhitespace: production,
-            loader: 'text',
+            loader: mergedShader(shader) ? undefined: 'text',
             format: 'esm'
           }
         );
